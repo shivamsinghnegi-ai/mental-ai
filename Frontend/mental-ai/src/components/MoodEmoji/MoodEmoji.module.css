@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.emojiBtn {
+  font-size: 36px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface);
+  border: 2px solid transparent;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.emojiBtn:hover {
+  transform: scale(1.15);
+  background-color: var(--bg-color);
+}
+
+.selected {
+  transform: scale(1.15);
+  background-color: var(--bg-color);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.15);
+}

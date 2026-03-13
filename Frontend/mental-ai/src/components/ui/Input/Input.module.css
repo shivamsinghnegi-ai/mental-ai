@@ -1,0 +1,27 @@
+.input {
+  display: flex;
+  height: 48px;
+  width: 100%;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  padding: 0 16px;
+  font-size: 14px;
+  color: var(--text-main);
+  transition: var(--transition);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-light);
+}
+
+.input:focus-visible {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 1px var(--border-focus);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

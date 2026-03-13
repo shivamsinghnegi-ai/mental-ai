@@ -1,0 +1,272 @@
+.container {
+  padding: 32px 24px;
+  min-height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 32px;
+  animation: fadeIn 0.4s ease;
+}
+
+.greeting {
+  font-size: 28px;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.date {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.section {
+  margin-bottom: 32px;
+  animation: slideUp 0.5s ease forwards;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: var(--text-main);
+}
+
+.affirmationContent {
+  padding: 24px !important;
+  text-align: center;
+}
+
+.affirmationText {
+  font-size: 18px;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--primary);
+  line-height: 1.4;
+}
+
+.moodCardContent {
+  padding: 20px !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.tagsArea {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  animation: slideUp 0.3s ease-out;
+}
+
+.tagsLabel {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tagBtn {
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  color: var(--text-main);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.tagBtn:hover {
+  background-color: var(--bg-color);
+}
+
+.tagActive {
+  background-color: var(--primary);
+  color: var(--surface);
+  border-color: var(--primary);
+}
+
+.moodSubmitBtn {
+  width: 100%;
+}
+
+.loaderLine {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: var(--primary);
+  width: 30%;
+  animation: loadLine 1s infinite linear;
+}
+
+@keyframes loadLine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+  animation: slideUp 0.6s ease forwards;
+}
+
+.statCard {
+  background-color: var(--surface);
+}
+
+.statContent {
+  padding: 16px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.statIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.statValue {
+  font-size: 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.actionRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+  animation: slideUp 0.7s ease forwards;
+}
+
+.actionBtnPrimary {
+  height: auto !important;
+  padding: 20px !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  text-align: left;
+}
+
+.actionBtnOutline {
+  height: auto !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  background-color: var(--surface);
+}
+
+.actionIcon {
+  width: 28px;
+  height: 28px;
+}
+
+.actionTitle {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.actionSub {
+  display: block;
+  font-size: 13px;
+  opacity: 0.9;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+.chartHeader {
+  padding: 24px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.chartTitle {
+  font-size: 18px;
+}
+
+.chartSubtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.chartContainer {
+  height: 300px;
+  padding: 24px 24px 24px 0;
+}
+
+.tipsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tipContent {
+  padding: 16px !important;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.tipIconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tipText {
+  flex: 1;
+}
+
+.tipTitle {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.tipDesc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.bottomSpacer {
+  height: 40px;
+}
+
+@media (max-width: 640px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+  
+  .actionRow {
+    grid-template-columns: 1fr;
+  }
+}

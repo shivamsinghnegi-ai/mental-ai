@@ -1,0 +1,258 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  max-width: 1100px;
+  margin: 0 auto 24px;
+  width: 100%;
+}
+
+.backBtn {
+  color: var(--text-main);
+  padding: 8px;
+  margin-left: -8px;
+  border-radius: 50%;
+}
+
+.backBtn:hover {
+  background-color: var(--surface);
+}
+
+.title {
+  font-size: 28px;
+  color: var(--text-main);
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  animation: slideUp 0.6s ease forwards;
+}
+
+/* --- Writing Column --- */
+.writingColumn {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cardContent {
+  padding: 32px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dateLabel {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.promptBox {
+  background: linear-gradient(135deg, rgba(74, 124, 89, 0.06), rgba(74, 124, 89, 0.02));
+  border-left: 4px solid var(--primary);
+  padding: 16px;
+  border-radius: 0 12px 12px 0;
+}
+
+.promptHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.promptLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sparkleIcon {
+  color: var(--primary);
+}
+
+.promptLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.shuffleBtn {
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shuffleBtn:hover {
+  color: var(--primary);
+  background-color: rgba(74, 124, 89, 0.08);
+}
+
+.promptText {
+  font-size: 18px;
+  color: var(--primary);
+  font-style: italic;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 16px;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 220px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  line-height: 1.7;
+  resize: none;
+  outline: none;
+  color: var(--text-main);
+  font-family: inherit;
+}
+
+.textarea::placeholder {
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.wordCount {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.submitBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Past Entries Toggle (mobile) */
+.pastToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--radius-btn);
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pastToggle:hover {
+  background-color: rgba(74, 124, 89, 0.06);
+  color: var(--primary);
+}
+
+/* --- Past Entries Column --- */
+.pastColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 280px;
+}
+
+.pastTitle {
+  font-size: 16px;
+  color: var(--text-muted);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pastList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pastCard {
+  cursor: default;
+}
+
+.pastCardContent {
+  padding: 16px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pastDate {
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pastPrompt {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+.pastText {
+  font-size: 14px;
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .pastColumn {
+    display: none;
+  }
+
+  .pastVisible {
+    display: flex;
+    animation: slideUp 0.3s ease-out;
+  }
+}
+
+@media (min-width: 769px) {
+  .pastToggle {
+    display: none;
+  }
+}
