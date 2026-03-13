@@ -4,10 +4,12 @@ const fs = require('fs');
 
 async function test() {
   const key = process.env.GEMINI_API_KEY;
-  
+
   try {
     const genAI = new GoogleGenerativeAI(key);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash"
+    });
     const result = await model.generateContent('Say hello');
     fs.writeFileSync('test_results.txt', 'SUCCESS: ' + result.response.text());
   } catch (e) {

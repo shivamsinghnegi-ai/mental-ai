@@ -33,9 +33,8 @@ your "message" field MUST contain this sentence verbatim:
 texting 988 — they are available 24/7 and are here to help."
 
 CRITICAL — Response format:
-You MUST respond ONLY with a valid JSON object. 
-No markdown. No backticks. No text outside the JSON. Ever.
-
+Respond in JSON format using the following structure.
+Do not include explanations outside the JSON.
 JSON structure:
 {
   "message": "<your full empathetic response, 2-5 sentences>",
@@ -85,7 +84,9 @@ const ALLOWED_MOODS = [
 
 // ─── Initialize Gemini Client ────────────────────────────────────
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const model = genAI.getGenerativeModel({
+  model: "gemini-2.5-flash"
+});
 
 /**
  * Sanitize conversation history for Gemini's multi-turn chat format.
@@ -169,11 +170,17 @@ const getChatResponse = async (userMessage, conversationHistory = []) => {
     let parsed;
     try {
       const cleaned = raw
-        .replace(/```json/g, '')
-        .replace(/```/g, '')
-        .trim();
+  .replace(/```json/g, '')
+  .replace(/```/g, '')
+  .trim();
+const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
 
-      parsed = JSON.parse(cleaned);
+if (!jsonMatch) {
+  console.error("No JSON found in Gemini response:", raw);
+  return FALLBACK_RESPONSE;
+}
+
+parsed = JSON.parse(jsonMatch[0]);
     } catch (err) {
       console.error('Failed to parse Gemini JSON:', raw);
       return FALLBACK_RESPONSE;
