@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import api from '../../api/axios';
 import useAuthStore from '../../store/authStore';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../../components/ui/Card/Card';
 import { Button } from '../../components/ui/Button/Button';
@@ -31,21 +32,18 @@ export default function LoginPage() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      // Fake API call for now; replace with actual endpoint when ready
-      // const response = await api.post('/auth/login', data);
-      
-      // Simulate network
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Fake successful response
-      const fakeToken = 'sample_jwt_token_123';
-      const fakeUser = { id: 1, name: 'Alex', email: data.email };
-      
-      setAuth(fakeUser, fakeToken);
+      const response = await api.post('/auth/login', data);
+      const { token, user } = response.data;
+
+      setAuth(user, token);
       toast.success('Welcome back!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to login');
+      const message =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Failed to login';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

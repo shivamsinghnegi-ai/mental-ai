@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import CrisisBanner from '../../components/CrisisBanner/CrisisBanner';
 import TypingIndicator from '../../components/TypingIndicator/TypingIndicator';
 import { Button } from '../../components/ui/Button/Button';
+import api from '../../api/axios';
 import styles from './Chat.module.css';
 
 export default function ChatPage() {
@@ -12,6 +13,7 @@ export default function ChatPage() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [crisisScore, setCrisisScore] = useState(0);
+  const [sessionId, setSessionId] = useState(null);
   const messagesEndRef = useRef(null);
 
   // Initial greeting
@@ -46,33 +48,48 @@ export default function ChatPage() {
       timestamp: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
 
     try {
-      // Fake API delay simulating backend processing
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Fake response logic
-      const isCrisis = userMessage.text.toLowerCase().includes('kill') || 
-                       userMessage.text.toLowerCase().includes('hopeless');
-      
-      if (isCrisis) {
-        setCrisisScore(5); // Trigger banner
+      // Build minimal conversation history for the backend
+      const conversationHistory = [...messages, userMessage].map((msg) => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text,
+      }));
+
+      const response = await api.post('/chat/message', {
+        message: userMessage.text,
+        conversationHistory,
+        sessionId,
+      });
+
+      const payload = response.data?.data || {};
+      const {
+        message: aiText,
+        crisisScore: apiCrisisScore,
+        copingTip,
+        sessionId: newSessionId,
+      } = payload;
+
+      const effectiveSessionId = newSessionId || sessionId;
+      if (!sessionId && effectiveSessionId) {
+        setSessionId(effectiveSessionId);
       }
 
       const aiResponse = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: isCrisis 
-          ? "I'm so sorry you're feeling this way. It takes courage to say that. Please know there is support available right now."
-          : "Thank you for sharing that with me. It sounds like you're going through a lot. Can you tell me more about what's been happening?",
+        text: aiText,
         timestamp: new Date().toISOString(),
-        coping_tip: isCrisis ? null : "Try placing a hand on your chest and taking a deep breath.",
+        coping_tip: copingTip,
       };
 
-      setMessages(prev => [...prev, aiResponse]);
+      setMessages((prev) => [...prev, aiResponse]);
+      if (typeof apiCrisisScore === 'number') {
+        setCrisisScore(apiCrisisScore);
+      }
     } catch (error) {
       console.error('Failed to send message', error);
     } finally {

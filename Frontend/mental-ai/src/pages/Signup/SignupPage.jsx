@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useAuthStore from '../../store/authStore';
+import api from '../../api/axios';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../../components/ui/Card/Card';
 import { Button } from '../../components/ui/Button/Button';
 import { Input } from '../../components/ui/Input/Input';
@@ -32,21 +33,18 @@ export default function SignupPage() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      // Fake API call for now; replace with actual endpoint when ready
-      // const response = await api.post('/auth/signup', data);
-      
-      // Simulate network
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Fake successful response
-      const fakeToken = 'sample_jwt_token_456';
-      const fakeUser = { id: 2, name: data.name, email: data.email };
-      
-      setAuth(fakeUser, fakeToken);
+      const response = await api.post('/auth/signup', data);
+      const { token, user } = response.data;
+
+      setAuth(user, token);
       toast.success('Account created successfully!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create account');
+      const message =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Failed to create account';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

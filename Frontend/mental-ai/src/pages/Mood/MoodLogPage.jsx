@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import api from '../../api/axios';
 import { Check, ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card/Card';
 import { Button } from '../../components/ui/Button/Button';
@@ -28,16 +29,18 @@ export default function MoodLogPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // Fake API simulation
-      // await api.post('/mood', { score, note });
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
+      await api.post('/mood', { score, note });
+
       toast.success('Mood logged successfully', {
         icon: '🌱',
       });
       navigate('/dashboard');
-    } catch {
-      toast.error('Failed to log mood. Please try again.');
+    } catch (error) {
+      const message =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Failed to log mood. Please try again.';
+      toast.error(message);
       setIsSubmitting(false);
     }
   };
