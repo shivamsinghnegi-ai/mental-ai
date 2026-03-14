@@ -1,32 +1,60 @@
 .container {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
 }
 
-.emojiBtn {
-  font-size: 36px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--surface);
+.moodBtn {
+  flex: 1;
+  min-width: 70px;
+  max-width: 120px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
   border: 2px solid transparent;
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-family: inherit;
 }
 
-.emojiBtn:hover {
-  transform: scale(1.15);
-  background-color: var(--bg-color);
+.moodBtn:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+/* Color gradients for each mood level */
+.low {
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  color: #991B1B;
+}
+
+.low-mid {
+  background: linear-gradient(135deg, #FFEDD5 0%, #FED7AA 100%);
+  color: #9A3412;
+}
+
+.mid {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  color: #92400E;
+}
+
+.mid-high {
+  background: linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%);
+  color: #166534;
+}
+
+.high {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #065F46;
 }
 
 .selected {
-  transform: scale(1.15);
-  background-color: var(--bg-color);
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.15);
+  box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.25);
+  transform: translateY(-2px);
 }

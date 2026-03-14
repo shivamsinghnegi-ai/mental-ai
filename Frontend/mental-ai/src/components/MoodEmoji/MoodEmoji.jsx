@@ -2,11 +2,11 @@ import React from 'react';
 import styles from './MoodEmoji.module.css';
 
 export const MOODS = [
-  { emoji: '😠', value: 1, label: 'Very Bad' },
-  { emoji: '😟', value: 3, label: 'Bad' },
-  { emoji: '😐', value: 5, label: 'Okay' },
-  { emoji: '🙂', value: 7, label: 'Good' },
-  { emoji: '😊', value: 9, label: 'Great' }
+  { value: 1, label: 'Struggling', color: 'low' },
+  { value: 3, label: 'Low', color: 'low-mid' },
+  { value: 5, label: 'Okay', color: 'mid' },
+  { value: 7, label: 'Good', color: 'mid-high' },
+  { value: 9, label: 'Great', color: 'high' },
 ];
 
 export default function MoodEmoji({ value, onSelect, className = '' }) {
@@ -17,11 +17,11 @@ export default function MoodEmoji({ value, onSelect, className = '' }) {
           key={mood.value}
           type="button"
           onClick={() => onSelect(mood.value)}
-          className={`${styles.emojiBtn} ${value === mood.value ? styles.selected : ''}`}
+          className={`${styles.moodBtn} ${styles[mood.color]} ${value === mood.value ? styles.selected : ''}`}
           aria-label={mood.label}
           title={mood.label}
         >
-          {mood.emoji}
+          {mood.label}
         </button>
       ))}
     </div>
