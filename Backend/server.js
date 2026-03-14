@@ -11,6 +11,7 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth.routes');
 const chatRoutes = require('./routes/chat.routes');
 const moodRoutes = require('./routes/mood.routes');
+const journalRoutes = require('./routes/journal.routes');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/mood', moodRoutes);
+app.use('/api/journal', journalRoutes);
 
 // ─── 404 Handler ─────────────────────────────────
 app.use((req, res) => {

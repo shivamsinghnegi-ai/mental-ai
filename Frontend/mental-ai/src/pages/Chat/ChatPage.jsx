@@ -1,11 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, ArrowLeft } from 'lucide-react';
+import { Send, ArrowLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CrisisBanner from '../../components/CrisisBanner/CrisisBanner';
 import TypingIndicator from '../../components/TypingIndicator/TypingIndicator';
 import { Button } from '../../components/ui/Button/Button';
 import api from '../../api/axios';
 import styles from './Chat.module.css';
+
+// Infer app route from tip text (for history or when backend doesn't send route)
+function getTipRoute(tipText) {
+  if (!tipText || typeof tipText !== 'string') return null;
+  const t = tipText.toLowerCase();
+  if (/\bbreathe|breathing\b/.test(t)) return 'breathe';
+  if (/\bmeditat|mindful\b/.test(t)) return 'meditate';
+  if (/\bjournal|gratitude|write down|write about\b/.test(t)) return 'journal';
+  if (/\bmood|log how you feel|track your mood\b/.test(t)) return 'mood';
+  return null;
+}
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -70,6 +81,7 @@ export default function ChatPage() {
         message: aiText,
         crisisScore: apiCrisisScore,
         copingTip,
+        copingTipRoute,
         sessionId: newSessionId,
       } = payload;
 
@@ -84,6 +96,7 @@ export default function ChatPage() {
         text: aiText,
         timestamp: new Date().toISOString(),
         coping_tip: copingTip,
+        coping_tip_route: copingTipRoute || null,
       };
 
       setMessages((prev) => [...prev, aiResponse]);
@@ -131,13 +144,28 @@ export default function ChatPage() {
                   {msg.text}
                 </div>
                 
-                {/* Coping Tip Badge underneath AI message */}
-                {msg.coping_tip && (
-                  <div className={styles.copingTip}>
-                    <span className={styles.copingTipLabel}>Tip</span>
-                    {msg.coping_tip}
-                  </div>
-                )}
+                {/* Coping Tip Badge underneath AI message - clickable when route exists */}
+                {msg.coping_tip && (() => {
+                  const route = msg.coping_tip_route || getTipRoute(msg.coping_tip);
+                  const path = route ? `/${route}` : null;
+                  return (
+                    <div className={styles.copingTip}>
+                      <span className={styles.copingTipLabel}>Tip</span>
+                      {path ? (
+                        <button
+                          type="button"
+                          className={styles.copingTipLink}
+                          onClick={() => navigate(path)}
+                        >
+                          {msg.coping_tip}
+                          <ChevronRight size={16} className={styles.copingTipArrow} />
+                        </button>
+                      ) : (
+                        <span>{msg.coping_tip}</span>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           );

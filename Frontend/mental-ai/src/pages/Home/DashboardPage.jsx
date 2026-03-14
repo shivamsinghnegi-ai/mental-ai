@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { MessageCircle, History, Flame, Activity, CalendarDays } from 'lucide-react';
@@ -8,18 +8,33 @@ import useAuthStore from '../../store/authStore';
 import MoodEmoji from '../../components/MoodEmoji/MoodEmoji';
 import { Card, CardContent } from '../../components/ui/Card/Card';
 import { Button } from '../../components/ui/Button/Button';
+import api from '../../api/axios';
 import styles from './Dashboard.module.css';
 
-// Mock data for the chart
-const mockChartData = [
-  { day: 'Mon', score: 6 },
-  { day: 'Tue', score: 5 },
-  { day: 'Wed', score: 7 },
-  { day: 'Thu', score: 8 },
-  { day: 'Fri', score: 6 },
-  { day: 'Sat', score: 9 },
-  { day: 'Sun', score: 8 },
-];
+function buildChartData(history = []) {
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const byDate = {};
+  history.forEach((h) => {
+    if (h.rawDate && h.score != null) byDate[h.rawDate] = h.score;
+  });
+  const result = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    d.setHours(0, 0, 0, 0);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const rawDate = `${y}-${m}-${day}`;
+    const dayName = dayNames[d.getDay()];
+    result.push({
+      day: `${dayName} ${d.getDate()}`,
+      rawDate,
+      score: byDate[rawDate] ?? null,
+    });
+  }
+  return result;
+}
 
 const AFFIRMATIONS = [
   "You are capable of amazing things.",
@@ -39,10 +54,38 @@ export default function DashboardPage() {
   const [selectedTags, setSelectedTags] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [affirmation, setAffirmation] = useState('');
+  const [chartData, setChartData] = useState([]);
+  const [stats, setStats] = useState({ streak: 0, avgMoodThisWeek: 0, totalLogs: 0 });
+  const [loadingChart, setLoadingChart] = useState(true);
+
+  const fetchMoodData = useCallback(async () => {
+    try {
+      const [historyRes, statsRes] = await Promise.all([
+        api.get('/mood/history'),
+        api.get('/mood/stats'),
+      ]);
+      const history = historyRes.data?.history || [];
+      setChartData(buildChartData(history));
+      const s = statsRes.data?.stats || {};
+      setStats({
+        streak: s.streak ?? 0,
+        avgMoodThisWeek: s.avgMoodThisWeek ?? 0,
+        totalLogs: s.totalLogs ?? 0,
+      });
+    } catch {
+      setChartData(buildChartData([]));
+    } finally {
+      setLoadingChart(false);
+    }
+  }, []);
 
   useEffect(() => {
     setAffirmation(AFFIRMATIONS[Math.floor(Math.random() * AFFIRMATIONS.length)]);
   }, []);
+
+  useEffect(() => {
+    fetchMoodData();
+  }, [fetchMoodData]);
 
   const toggleTag = (tag) => {
     if (selectedTags.includes(tag)) {
@@ -52,7 +95,7 @@ export default function DashboardPage() {
     }
   };
 
-  const handleMoodSelect = async (val) => {
+  const handleMoodSelect = (val) => {
     setSelectedMood(val);
   };
 
@@ -60,15 +103,15 @@ export default function DashboardPage() {
     if (!selectedMood) return;
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await api.post('/mood', { score: selectedMood, note: selectedTags.length ? selectedTags.join(', ') : '' });
       toast.success('Mood logged successfully!');
+      setSelectedMood(null);
+      setSelectedTags([]);
+      fetchMoodData();
     } catch {
       toast.error('Failed to log mood');
     } finally {
       setIsSubmitting(false);
-      setSelectedMood(null);
-      setSelectedTags([]); // reset after submitting
     }
   };
 
@@ -148,7 +191,7 @@ export default function DashboardPage() {
           <CardContent className={styles.statContent}>
             <Flame className={styles.statIcon} style={{ color: '#F59E0B' }} />
             <div>
-              <p className={styles.statValue}>7 days</p>
+              <p className={styles.statValue}>{stats.streak} {stats.streak === 1 ? 'day' : 'days'}</p>
               <p className={styles.statLabel}>Current streak</p>
             </div>
           </CardContent>
@@ -157,7 +200,7 @@ export default function DashboardPage() {
           <CardContent className={styles.statContent}>
             <Activity className={styles.statIcon} style={{ color: 'var(--primary)' }} />
             <div>
-              <p className={styles.statValue}>7.0</p>
+              <p className={styles.statValue}>{stats.avgMoodThisWeek ? stats.avgMoodThisWeek.toFixed(1) : '—'}</p>
               <p className={styles.statLabel}>Avg mood</p>
             </div>
           </CardContent>
@@ -166,8 +209,8 @@ export default function DashboardPage() {
           <CardContent className={styles.statContent}>
             <CalendarDays className={styles.statIcon} style={{ color: '#3B82F6' }} />
             <div>
-              <p className={styles.statValue}>12</p>
-              <p className={styles.statLabel}>Sessions</p>
+              <p className={styles.statValue}>{stats.totalLogs}</p>
+              <p className={styles.statLabel}>Mood logs</p>
             </div>
           </CardContent>
         </Card>
@@ -197,7 +240,7 @@ export default function DashboardPage() {
         </Button>
       </section>
 
-      {/* Recharts Chart */}
+      {/* Recharts Chart - real mood history from API */}
       <section className={styles.section}>
         <Card>
           <div className={styles.chartHeader}>
@@ -205,36 +248,44 @@ export default function DashboardPage() {
             <span className={styles.chartSubtitle}>Last 7 days</span>
           </div>
           <div className={styles.chartContainer}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockChartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                <XAxis 
-                  dataKey="day" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: 'var(--text-light)', fontSize: 12 }} 
-                  dy={10}
-                />
-                <YAxis 
-                  domain={[0, 10]} 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: 'var(--text-light)', fontSize: 12 }}
-                  dx={-10}
-                />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="score" 
-                  stroke="var(--primary)" 
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: 'var(--surface)', stroke: 'var(--primary)', strokeWidth: 2 }}
-                  activeDot={{ r: 6, fill: 'var(--primary)' }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {loadingChart ? (
+              <p className={styles.chartPlaceholder}>Loading...</p>
+            ) : chartData.every((d) => d.score == null) ? (
+              <p className={styles.chartPlaceholder}>Log your mood above to see your history here.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={220}>
+                <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                  <XAxis 
+                    dataKey="day" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: 'var(--text-light)', fontSize: 11 }} 
+                    dy={10}
+                  />
+                  <YAxis 
+                    domain={[0, 10]} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: 'var(--text-light)', fontSize: 12 }}
+                    dx={-10}
+                  />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}
+                    formatter={(value) => (value != null ? [value, 'Mood'] : ['No data', ''])}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="score" 
+                    stroke="var(--primary)" 
+                    strokeWidth={3}
+                    connectNulls={false}
+                    dot={{ r: 4, fill: 'var(--surface)', stroke: 'var(--primary)', strokeWidth: 2 }}
+                    activeDot={{ r: 6, fill: 'var(--primary)' }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </Card>
       </section>

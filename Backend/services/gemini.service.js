@@ -40,7 +40,8 @@ JSON structure:
   "message": "<your full empathetic response, 2-5 sentences>",
   "crisis_score": <integer 1-5>,
   "mood_detected": "<one word from this list only: anxious|sad|angry|overwhelmed|neutral|hopeful|happy>",
-  "coping_tip": "<one short actionable tip under 20 words, or null if not appropriate right now>"
+  "coping_tip": "<one short actionable tip under 20 words, or null if not appropriate right now>",
+  "coping_tip_route": "<null, or exactly one of: breathe|meditate|journal|mood when your tip suggests that app feature — e.g. breathing exercise -> breathe, meditation -> meditate, gratitude journal -> journal, mood log -> mood>"
 }
 
 crisis_score guide — be precise:
@@ -215,11 +216,20 @@ parsed = JSON.parse(jsonMatch[0]);
       copingTip = parsed.coping_tip.trim() || null;
     }
 
+    // Validate coping_tip_route (optional)
+    const ALLOWED_TIP_ROUTES = ['breathe', 'meditate', 'journal', 'mood'];
+    let copingTipRoute = null;
+    if (typeof parsed.coping_tip_route === 'string') {
+      const slug = parsed.coping_tip_route.trim().toLowerCase();
+      if (ALLOWED_TIP_ROUTES.includes(slug)) copingTipRoute = slug;
+    }
+
     return {
       message,
       crisis_score: crisisScore,
       mood_detected: moodDetected,
       coping_tip: copingTip,
+      coping_tip_route: copingTipRoute,
       error: false,
     };
   } catch (error) {

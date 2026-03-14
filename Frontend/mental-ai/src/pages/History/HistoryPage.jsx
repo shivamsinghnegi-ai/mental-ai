@@ -1,33 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronRight, X } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card/Card';
+import api from '../../api/axios';
 import styles from './History.module.css';
 
-const mockSessions = [
-  {
-    id: '1',
-    date: '2026-03-12T14:30:00Z',
-    mood: { emoji: '😟', label: 'Bad' },
-    preview: "I've been feeling really overwhelmed at work lately...",
-    messages: [
-      { sender: 'user', text: "I've been feeling really overwhelmed at work lately..." },
-      { sender: 'ai', text: "I hear you. Work stress can definitely build up. Can you tell me what the most overwhelming part is right now?" }
-    ]
-  },
-  {
-    id: '2',
-    date: '2026-03-10T09:15:00Z',
-    mood: { emoji: '🙂', label: 'Good' },
-    preview: "I finally finished that big project I was worried about.",
-    messages: [
-      { sender: 'user', text: "I finally finished that big project I was worried about." },
-      { sender: 'ai', text: "That is fantastic news! You must feel so relieved. How are you celebrating?" }
-    ]
-  }
-];
+const moodToEmoji = (moodDetected) => {
+  if (!moodDetected) return { emoji: '💬', label: 'Chat' };
+  const m = moodDetected.toLowerCase();
+  if (['happy', 'hopeful'].includes(m)) return { emoji: '🙂', label: 'Good' };
+  if (['anxious', 'sad', 'overwhelmed', 'angry'].includes(m)) return { emoji: '😟', label: 'Heavy' };
+  return { emoji: '😐', label: 'Neutral' };
+};
 
 export default function HistoryPage() {
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchHistory = async () => {
+      try {
+        const res = await api.get('/chat/history');
+        const raw = res.data?.sessions || [];
+        const list = raw.map((s) => {
+          const msgs = s.messages || [];
+          const firstMsg = msgs[0];
+          const firstUser = msgs.find((m) => m.role === 'user');
+          const firstAi = msgs.find((m) => m.role === 'assistant');
+          const date = firstMsg?.timestamp || new Date().toISOString();
+          const mood = moodToEmoji(firstAi?.moodDetected);
+          return {
+            id: s.sessionId,
+            date,
+            mood: { emoji: mood.emoji, label: mood.label },
+            preview: firstUser ? (firstUser.content || '').substring(0, 80) : 'No messages',
+            messages: msgs.map((m) => ({
+              sender: m.role === 'user' ? 'user' : 'ai',
+              text: m.content || '',
+            })),
+          };
+        });
+        list.sort((a, b) => new Date(b.date) - new Date(a.date));
+        if (!cancelled) setSessions(list);
+      } catch {
+        if (!cancelled) setSessions([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchHistory();
+    return () => { cancelled = true; };
+  }, []);
 
   const formatDate = (isoString) => {
     return new Date(isoString).toLocaleDateString('en-US', {
@@ -49,7 +73,12 @@ export default function HistoryPage() {
       </header>
 
       <div className={styles.list}>
-        {mockSessions.map((session) => (
+        {loading ? (
+          <p className={styles.subtitle}>Loading your chat history...</p>
+        ) : sessions.length === 0 ? (
+          <p className={styles.subtitle}>No chat history yet. Start a conversation from the Chat page.</p>
+        ) : (
+        sessions.map((session) => (
           <Card 
             key={session.id} 
             className={styles.sessionCard}
@@ -71,7 +100,7 @@ export default function HistoryPage() {
               </div>
             </CardContent>
           </Card>
-        ))}
+        )))}
       </div>
 
       {selectedSession && (

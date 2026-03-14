@@ -57,8 +57,9 @@ exports.getMoodHistory = async (req, res, next) => {
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const formatted = logs.map((log) => {
-      const date = new Date(log._id);
+      const date = new Date(log._id + 'T12:00:00');
       return {
+        rawDate: log._id,
         date: dayNames[date.getDay()],
         score: Math.round(log.avgScore * 10) / 10,
         count: log.count,

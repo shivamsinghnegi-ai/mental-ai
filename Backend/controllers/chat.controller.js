@@ -98,6 +98,7 @@ exports.sendMessage = async (req, res, next) => {
         crisisScore: finalCrisisScore,
         moodDetected: aiResponse.mood_detected,
         copingTip: aiResponse.coping_tip,
+        copingTipRoute: aiResponse.coping_tip_route || null,
         sessionId: activeSessionId,
         isCrisis: finalCrisisScore >= 4,
         wasFallback: aiResponse.error || false,
