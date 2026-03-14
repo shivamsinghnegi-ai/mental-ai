@@ -40,9 +40,11 @@ export default function LoginPage() {
       navigate('/dashboard');
     } catch (error) {
       const message =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        'Failed to login';
+        error.response?.status === 401
+          ? 'Invalid email or password'
+          : error.response?.data?.error ||
+            error.response?.data?.message ||
+            'Failed to login';
       toast.error(message);
     } finally {
       setIsLoading(false);

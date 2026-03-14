@@ -49,18 +49,35 @@ function App() {
 
       <Toaster 
         position="top-center" 
+        containerStyle={{ zIndex: 99999 }}
         toastOptions={{
+          duration: 4000,
           style: {
             fontFamily: 'Inter, sans-serif',
             borderRadius: '12px',
-            background: 'var(--surface)',
-            color: 'var(--text-main)',
-            boxShadow: 'var(--shadow-md)',
-            border: '1px solid var(--border)',
+            background: '#FFFFFF',
+            color: '#1F2937',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            border: '1px solid #E5E7EB',
+            padding: '12px 16px',
+            fontSize: '14px',
+            maxWidth: '400px',
           },
           success: {
             iconTheme: {
               primary: 'var(--primary)',
+              secondary: 'white',
+            },
+          },
+          error: {
+            duration: 5000,
+            style: {
+              background: '#FEF2F2',
+              color: '#991B1B',
+              border: '1px solid #FECACA',
+            },
+            iconTheme: {
+              primary: '#EF4444',
               secondary: 'white',
             },
           },

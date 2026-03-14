@@ -20,14 +20,17 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: handle 401 Unauthorized
+// Response interceptor: handle 401 Unauthorized (but not for login attempt)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token and redirect to login
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
+      const isLoginRequest = error.config?.url?.includes('/auth/login');
+      // Don't logout/redirect when user is on login page with wrong credentials
+      if (!isLoginRequest) {
+        useAuthStore.getState().logout();
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
